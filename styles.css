@@ -499,6 +499,9 @@ video {
 [hidden]:where(:not([hidden="until-found"])) {
   display: none;
 }
+.collapse {
+  visibility: collapse;
+}
 .static {
   position: static;
 }
@@ -523,6 +526,9 @@ video {
 .top-0 {
   top: 0px;
 }
+.z-10 {
+  z-index: 10;
+}
 .mt-2 {
   margin-top: 0.5rem;
 }
@@ -534,6 +540,9 @@ video {
 }
 .flex {
   display: flex;
+}
+.table {
+  display: table;
 }
 .grid {
   display: grid;
@@ -705,44 +714,6 @@ video {
 }
 
 
-#inputCode,
-#outputCode {
-  width: 100%;
-  border-width: 1px;
-  --tw-border-opacity: 1;
-  border-color: rgb(209 213 219 / var(--tw-border-opacity, 1));
-  padding: 0.75rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}
-
-
-#inputCode:focus,
-#outputCode:focus {
-  border-color: transparent;
-}
-
-
-@media (prefers-color-scheme: dark) {
-
-  #inputCode,
-#outputCode {
-    --tw-border-opacity: 1;
-    border-color: rgb(55 65 81 / var(--tw-border-opacity, 1));
-    --tw-bg-opacity: 1;
-    background-color: rgb(31 41 55 / var(--tw-bg-opacity, 1));
-    --tw-text-opacity: 1;
-    color: rgb(243 244 246 / var(--tw-text-opacity, 1));
-  }
-}
-
-
-#inputCode,
-#outputCode {
-  height: calc(100vh - 130px);
-  overflow: auto;
-}
 #optionsContainer label {
   position: relative;
 }
@@ -845,6 +816,134 @@ video {
     color: rgb(17 24 39 / var(--tw-text-opacity, 1));
   }
 }
+
+
+.input-wrapper, .output-wrapper {
+  position: relative;
+}
+.line-wrapper {
+  position: relative;
+}
+
+.input-lines, .output-lines {
+  pointer-events: none;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  overflow: hidden;
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+  text-align: right;
+  --tw-bg-opacity: 1;
+  background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1));
+}
+
+@media (prefers-color-scheme: dark) {
+
+  .input-lines, .output-lines {
+    --tw-bg-opacity: 1;
+    background-color: rgb(17 24 39 / var(--tw-bg-opacity, 1));
+  }
+}
+
+.input-lines div,
+.output-lines div {
+  padding-left: 0.5rem;
+  padding-right: 0.375rem;
+  text-align: right;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+  --tw-text-opacity: 1;
+  color: rgb(107 114 128 / var(--tw-text-opacity, 1));
+}
+
+@media (prefers-color-scheme: dark) {
+
+  .input-lines div,
+.output-lines div {
+    --tw-text-opacity: 1;
+    color: rgb(229 231 235 / var(--tw-text-opacity, 1));
+  }
+}
+
+.input-wrapper textarea,
+.output-wrapper pre {
+  padding-left: 2.5rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  line-height: 1.5rem;
+  white-space: pre;
+}
+
+.input-lines,
+.output-lines,
+#inputCode,
+#outputCode {
+  height: calc(100vh - 140px);
+  overflow: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.75rem;
+  line-height: 1.5rem;
+}
+.input-lines,
+.output-lines {
+  overflow: hidden;
+}
+#inputCode,
+#outputCode {
+  width: 100%;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+#inputCode:focus,
+#outputCode:focus {
+  border-color: transparent;
+}
+@media (prefers-color-scheme: dark) {
+
+  #inputCode,
+#outputCode {
+    --tw-bg-opacity: 1;
+    background-color: rgb(31 41 55 / var(--tw-bg-opacity, 1));
+    --tw-text-opacity: 1;
+    color: rgb(243 244 246 / var(--tw-text-opacity, 1));
+  }
+}
+#inputCode,
+#outputCode {
+  resize: none;
+  padding-left: 3rem;
+}
+
+.line-wrapper {
+  border-width: 1px;
+  --tw-border-opacity: 1;
+  border-color: rgb(209 213 219 / var(--tw-border-opacity, 1));
+}
+
+@media (prefers-color-scheme: dark) {
+
+  .line-wrapper {
+    --tw-border-opacity: 1;
+    border-color: rgb(55 65 81 / var(--tw-border-opacity, 1));
+    --tw-bg-opacity: 1;
+    background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1));
+  }
+}
+
+.line-wrapper{
+line-height: 0;
+}
+
+/* 
+
+ */
 
 .hover\:border-gray-300:hover {
   --tw-border-opacity: 1;
