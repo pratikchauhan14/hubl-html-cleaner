@@ -32,23 +32,27 @@ export class HTMLStatic {
             <div class="grid grid-cols-1 lg:grid-cols-2">
                 <!-- Input Section -->
                 <div class="space-y-4">
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-4 input-wrapper">
                         <label for="inputCode" class="block text-sm font-medium text-gray-700 dark:text-gray-100">Input Code</label>
                         <span id="charCount" class="text-xs text-gray-500">0 characters</span>
                     </div>
+                    <div class="relative line-wrapper">
                     <textarea id="inputCode" class="" placeholder="Paste your HubL/HTML code here..." spellcheck="false"></textarea>
+                    <div class="input-lines" id="inputLines"></div>
+                    </div>
                 </div>
 
                 <!-- Output Section -->
                 <div class="space-y-4">
-                    <div class="flex items-center gap-5">
+                    <div class="flex items-center gap-5 ">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-100">Formatted Output</label>
                         </div>
                         <span id="outputCharCount" class="text-xs text-gray-500">0 characters</span>
+                        
                     </div>
                     <div class="relative">
-                        <div class="absolute top-0 right-0">
+                        <div class="absolute top-0 right-0 z-10">
                             <button id="copyBtn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 flex items-center space-x-2">
                                 <span>Copy to Clipboard</span>
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -61,7 +65,10 @@ export class HTMLStatic {
                                 </svg>
                             </button>
                         </div>
-                        <pre id="outputCode"></pre>
+                        <div class="relative line-wrapper">
+                            <pre id="outputCode"></pre>
+                            <div class="output-lines" id="outputLines"></div>
+                        </div>
                     </div>
                 </div>
             </div>

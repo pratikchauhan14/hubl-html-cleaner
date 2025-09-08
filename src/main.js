@@ -1,10 +1,10 @@
 // Main class definition
 
-import { FormatHTML } from "./utils/formatehtml";
+
+import { HubLFormatter } from "./utils/formatehtml";
 import { HTMLStatic } from "./utils/html";
 
-
-class HubLFormatter {
+class HubLFormatterApp {
   constructor() {
     this.app = document.getElementById('app');
     if (!this.app) {
@@ -12,8 +12,8 @@ class HubLFormatter {
       return;
     }
 
-    this.formatHTMLWrapper = new FormatHTML();
-    this.formatHTML = this.formatHTMLWrapper.formatHTML;
+    this.formatHTMLWrapper = new HubLFormatter();
+    this.formatHTML = this.formatHTMLWrapper.formatHTML.bind(this.formatHTMLWrapper);
 
     this.options = {
       useHublDashes: false,
@@ -52,24 +52,51 @@ class HubLFormatter {
       useHublDashes: document.getElementById('useHublDashes'),
       removeDataAttrs: document.getElementById('removeDataAttributes'),
       removeClasses: document.getElementById('removeClasses'),
-      removeStyleAttrs: document.getElementById('removeStyleAttrs')
+      removeStyleAttrs: document.getElementById('removeStyleAttrs'),
+      inputLines: document.getElementById('inputLines'),
+      outputLines: document.getElementById('outputLines')
     };
   }
 
   setupEventListeners() {
     if (!this.elements) return;
 
-    const { input, output, copyBtn, useHublDashes, removeDataAttrs, removeClasses } = this.elements;
+    const { input, inputLines, output, outputLines, copyBtn, useHublDashes, removeDataAttrs, removeClasses } = this.elements;
 
     if (!input || !output || !copyBtn) {
       console.error('Required elements not found');
       return;
     }
 
+    let isSyncingScroll = false;
+
+    const syncScroll = (source, targets) => {
+      if (isSyncingScroll) return;
+      isSyncingScroll = true;
+
+      const ratio = source.scrollTop / (source.scrollHeight - source.clientHeight);
+      targets.forEach(target => {
+        target.scrollTop = ratio * (target.scrollHeight - target.clientHeight);
+      });
+
+      isSyncingScroll = false;
+    };
+
+    // Scroll input and sync its line numbers and output block
+    input.addEventListener('scroll', () => {
+      syncScroll(input, [inputLines, output, outputLines]);
+    });
+
+    // Scroll output and sync its line numbers and input block
+    output.addEventListener('scroll', () => {
+      syncScroll(output, [outputLines, input, inputLines]);
+    });
+
     // Handle paste and input events
-    const formatInput = () => {
+    const formatInput = async () => {
       this.analyzeCode();
-      this.formatCode();
+      await this.formatCode();
+      this.updateInputLineNumbers();
     };
 
     input.addEventListener('paste', (e) => {
@@ -137,20 +164,22 @@ class HubLFormatter {
     }
   }
 
-  formatCode() {
+  async formatCode() {
     if (!this.elements) return;
 
     const input = this.elements.input.value;
     if (!input.trim()) {
       this.elements.output.textContent = '';
       this.updateCharCount(0, true);
+      this.updateOutputLineNumbers();
+      this.updateInputLineNumbers();
       return;
     }
 
     let formatted = input;
 
     // Always apply basic HTML/HubL formatting first
-    formatted = this.formatHTML(formatted);
+    formatted = await this.formatHTML(input);
 
     // Apply additional formatting based on options
     if (this.options.useHublDashes) {
@@ -177,6 +206,8 @@ class HubLFormatter {
 
     this.elements.output.textContent = formatted;
     this.updateCharCount(formatted.length, true);
+    this.updateOutputLineNumbers();
+    this.updateInputLineNumbers();
   }
 
   addHublDashes(code) {
@@ -212,8 +243,23 @@ class HubLFormatter {
       .replace(/\s+style\s*=[^\s>]+/gi, '');
   }
 
+  updateInputLineNumbers() {
+    const { input, inputLines } = this.elements;
+    if (!input || !inputLines) return;
 
+    const lines = input.value.split('\n').length || 1;
+    inputLines.innerHTML = '';
+    for (let i = 1; i <= lines; i++) {
+      inputLines.innerHTML += `<div>${i}</div>`;
+    }
+  }
 
+  updateOutputLineNumbers() {
+    const { output, outputLines } = this.elements;
+    if (!output || !outputLines) return;
+    const lines = output.textContent.split('\n');
+    outputLines.innerHTML = lines.map((_, i) => `<div>${i + 1}</div>`).join('');
+  }
 
   updateCharCount(count, isOutput = false) {
     const label = isOutput ? 'Output: ' : 'Input: ';
@@ -262,7 +308,7 @@ class HubLFormatter {
 // Initialize the app when DOM is ready
 function initApp() {
   try {
-    window.app = new HubLFormatter();
+    window.app = new HubLFormatterApp();
     if (!window.app.app) {
       console.error('Failed to initialize app');
     }
@@ -280,4 +326,4 @@ if (document.readyState === 'loading') {
 }
 
 // Export the class for ES modules
-export default HubLFormatter;
+export default HubLFormatterApp;
