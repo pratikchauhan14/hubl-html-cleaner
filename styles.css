@@ -919,6 +919,8 @@ video {
 #outputCode {
   resize: none;
   padding-left: 3rem;
+        overflow: auto;
+    white-space: pre;
 }
 
 .line-wrapper {
