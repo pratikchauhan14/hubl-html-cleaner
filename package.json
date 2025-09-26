@@ -24,7 +24,6 @@
   },
   "homepage": "https://pratikchauhan14.github.io/hubl-html-cleaner/",
   "devDependencies": {
-    "@shopify/prettier-plugin-liquid": "^1.10.0",
     "autoprefixer": "^10.4.21",
     "chokidar": "^4.0.3",
     "concurrently": "^8.2.2",
@@ -32,13 +31,10 @@
     "gh-pages": "^6.3.0",
     "postcss": "^8.5.6",
     "postcss-cli": "^11.0.1",
-    "prettier": "^3.6.2",
     "tailwindcss": "^3.4.17"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.13",
-    "js-beautify": "^1.15.4",
-    "prettier-plugin-liquid": "^0.0.1-security",
     "xregexp": "^5.1.2"
   }
 }

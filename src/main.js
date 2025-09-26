@@ -1,8 +1,11 @@
 // Main class definition
 
 
-import { HubLFormatter } from "./utils/formatehtml";
+// import { HubLFormatter } from "./utils/formatehtml";
+import { Formatter } from "./utils/formatter";
 import { HTMLStatic } from "./utils/html";
+
+
 
 class HubLFormatterApp {
   constructor() {
@@ -12,8 +15,9 @@ class HubLFormatterApp {
       return;
     }
 
-    this.formatHTMLWrapper = new HubLFormatter();
-    this.formatHTML = this.formatHTMLWrapper.formatHTML.bind(this.formatHTMLWrapper);
+    // this.formatHTMLWrapper = new HubLFormatter();
+    this.formatHTMLWrapper = new Formatter();
+    // this.formatHTML = this.formatHTMLWrapper.formatHTML.bind(this.formatHTMLWrapper);
 
     this.options = {
       useHublDashes: false,
@@ -179,18 +183,19 @@ class HubLFormatterApp {
     let formatted = input;
 
     // Always apply basic HTML/HubL formatting first
-    formatted = await this.formatHTML(input);
+    // formatted = await this.formatHTML(input);
+    formatted = await this.formatHTMLWrapper.formatHTML(input);
 
     // Apply additional formatting based on options
-    if (this.options.useHublDashes) {
-      // Only add dashes to HubL tags that don't already have them
-      formatted = this.addHublDashes(formatted);
-    } else {
-      // Remove dashes if checkbox is unchecked
-      formatted = formatted
-        .replace(/\{\s*%-/g, '{%')
-        .replace(/-%\s*\}/g, '%}');
-    }
+    // if (this.options.useHublDashes) {
+    //   // Only add dashes to HubL tags that don't already have them
+    //   formatted = this.addHublDashes(formatted);
+    // } else {
+    //   // Remove dashes if checkbox is unchecked
+    //   formatted = formatted
+    //     .replace(/\{\s*%-/g, '{%')
+    //     .replace(/-%\s*\}/g, '%}');
+    // }
 
     if (this.options.removeDataAttributes) {
       formatted = this.removeDataAttributes(formatted);
@@ -205,7 +210,7 @@ class HubLFormatterApp {
     }
 
     this.elements.output.textContent = formatted;
-    this.updateCharCount(formatted.length, true);
+    // this.updateCharCount(formatted.length, true);
     this.updateOutputLineNumbers();
     this.updateInputLineNumbers();
   }

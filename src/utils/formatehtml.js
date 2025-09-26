@@ -31,100 +31,6 @@ export class HubLFormatter {
         return html.replace(/__HUBL_EXPR_(\d+)__/g, (_, i) => placeholders[i].value);
     }
 
-    formatHubL(content, baseIndent = 0) {
-        const lines = content.split('\n').map(line => line.trim()).filter(line => line);
-        if (!lines.length) return '';
-
-        const result = [];
-        let indentLevel = baseIndent;
-        
-        // HubL control structure patterns
-        const blockStart = /^{%-?\s*(if|for|macro|block|autoescape|filter|trans|with|call|raw|spaceless|compress|set)\b/;
-        const blockEnd = /^{%-?\s*end(if|for|macro|block|autoescape|filter|trans|with|call|raw|spaceless|compress)\b/;
-        const blockMiddle = /^{%-?\s*(else|elif|elsif|elseif)\b/;
-        const standalone = /^{%-?\s*(include|import|from|extends|load)\b/;
-
-        for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
-            let currentIndent = indentLevel;
-
-            // Handle closing tags - decrease indent first
-            if (blockEnd.test(line)) {
-                currentIndent = Math.max(0, indentLevel - 1);
-                indentLevel = currentIndent;
-            }
-            // Handle middle blocks (else, elif) - decrease indent temporarily
-            else if (blockMiddle.test(line)) {
-                currentIndent = Math.max(0, indentLevel - 1);
-            }
-
-            // Add the formatted line
-            result.push(this.tab.repeat(currentIndent) + line);
-
-            // Handle opening tags - increase indent after adding line
-            if (blockStart.test(line) && !standalone.test(line)) {
-                indentLevel++;
-            }
-        }
-
-        return result.join('\n');
-    }
-
-    formatHTMLContent(content, baseIndent = 0) {
-        const lines = content.split('\n').map(line => line.trim()).filter(line => line);
-        if (!lines.length) return '';
-
-        const result = [];
-        let indentLevel = baseIndent;
-        const stack = [];
-        
-        // HTML element categories
-        const selfClosing = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']);
-        const inline = new Set(['a', 'abbr', 'b', 'bdo', 'br', 'button', 'cite', 'code', 'dfn', 'em', 'i', 'img', 'input', 'kbd', 'label', 'map', 'object', 'q', 'samp', 'script', 'select', 'small', 'span', 'strong', 'sub', 'sup', 'textarea', 'var']);
-
-        for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
-            let currentIndent = indentLevel;
-
-            // Check if this is an HTML tag
-            const tagMatch = line.match(/^<\/?([a-zA-Z][a-zA-Z0-9-]*)/);
-            
-            if (tagMatch) {
-                const tagName = tagMatch[1].toLowerCase();
-                const isClosing = line.startsWith('</');
-                const isSelfClosing = line.endsWith('/>') || selfClosing.has(tagName);
-                const isInline = inline.has(tagName);
-
-                if (isClosing) {
-                    // Find matching opening tag and close all nested tags
-                    let found = false;
-                    for (let j = stack.length - 1; j >= 0; j--) {
-                        if (stack[j].tagName === tagName) {
-                            // Remove all tags from this point
-                            const removed = stack.splice(j);
-                            indentLevel -= removed.length;
-                            found = true;
-                            break;
-                        }
-                    }
-                    currentIndent = indentLevel;
-                }
-
-                result.push(this.tab.repeat(currentIndent) + line);
-
-                // Handle opening tags
-                if (!isClosing && !isSelfClosing && !isInline) {
-                    stack.push({ tagName, line: i });
-                    indentLevel++;
-                }
-            } else {
-                // Text content
-                result.push(this.tab.repeat(currentIndent) + line);
-            }
-        }
-
-        return result.join('\n');
-    }
 
     async formatJavaScript(content, baseIndent = 0) {
         try {
@@ -426,9 +332,7 @@ export class HubLFormatter {
         const blockMiddle = XRegExp('^{%-?\\s*(else|elif|elsif|elseif)\\b');
         const standalone = XRegExp('^{%-?\\s*(include|import|from|extends|load)\\b');
 
-        // Helper: is this a HubL tag or expression?
-        const isHubLTag = (val) =>
-            XRegExp.exec(val, hublBlockPattern) || XRegExp.exec(val, hublExprPattern);
+        
 
         let middleBlockActive = false;
         let middleBlockBaseIndent = 0;
@@ -633,55 +537,8 @@ export class HubLFormatter {
         return result.join('\n').replace(/\n{2,}/g, '\n');
     }
 
-    // This method is no longer needed as we handle mixed content in one pass
-    // but keeping it for backward compatibility if needed elsewhere
-    parseBlocks(content) {
-        return [{ type: 'mixed', content: content, indent: 0 }];
-    }
 
-    extractBlockContent(fullContent, startTag, endTag) {
-        const lines = fullContent.split('\n');
-        const contentLines = [];
-        let inContent = false;
+    
 
-        for (const line of lines) {
-            if (line.trim().includes(startTag)) {
-                inContent = true;
-                // Extract content after the opening tag if it's on the same line
-                const afterTag = line.substring(line.indexOf('>') + 1);
-                if (afterTag.trim() && !afterTag.trim().includes(endTag)) {
-                    contentLines.push(afterTag);
-                }
-                continue;
-            }
-            
-            if (line.trim().includes(endTag)) {
-                inContent = false;
-                // Extract content before the closing tag if it's on the same line
-                const beforeTag = line.substring(0, line.indexOf(endTag));
-                if (beforeTag.trim()) {
-                    contentLines.push(beforeTag);
-                }
-                break;
-            }
-            
-            if (inContent) {
-                contentLines.push(line);
-            }
-        }
-
-        return contentLines.join('\n');
-    }
-
-    wrapInTags(content, startTag, endTag, originalContent) {
-        const lines = originalContent.split('\n');
-        const openingLine = lines.find(line => line.includes(startTag)) || `${startTag}>`;
-        const closingLine = lines.find(line => line.includes(endTag)) || endTag;
-        
-        if (!content.trim()) {
-            return `${openingLine}\n${closingLine}`;
-        }
-        
-        return `${openingLine}\n${content}\n${closingLine}`;
-    }
+   
 }
